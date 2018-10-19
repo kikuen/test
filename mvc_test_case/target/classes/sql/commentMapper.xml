@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.koreate.dao.CommentDao">
+
+	<select id="list" resultType="replyVo">
+		select * from
+		tbl_comment
+		where bno =
+		#{bno}
+		order by cno desc
+	</select>
+
+	<insert id="create">
+		insert into tbl_comment (bno, commentText, commentAuth,uno)
+		values (#{bno},#{commentText},#{commentAuth},#{uno})
+	</insert>
+
+	<update id="update">
+		update tbl_comment set commentText = #{commentText},
+		updatedate = now()
+		where cno = #{cno}
+	</update>
+
+	<delete id="delete">
+		delete from tbl_comment where cno =#{cno}
+	</delete>
+
+
+	<select id="listPage" parameterType="java.util.HashMap" resultType="replyVo">
+		SELECT t.* FROM
+		(SELECT @rownum := @rownum + 1 AS rno, tbl_comment.*
+		    FROM tbl_comment, (SELECT @rownum :=0) r where bno = #{bno} order by cno ASC 
+		) t ORDER BY rno DESC
+		limit #{cri.pageStart}, #{cri.perPageNum}
+	
+	
+		<!-- select * from  tbl_comment
+		where bno = #{bno} order by cno desc
+		limit #{cri.pageStart}, #{cri.perPageNum} -->
+	</select>
+
+	<select id="count"  resultType="int">
+		select count(bno) from tbl_comment where bno =#{bno}
+	</select>
+
+
+</mapper>
+

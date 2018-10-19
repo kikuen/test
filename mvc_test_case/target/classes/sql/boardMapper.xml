@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.koreate.dao.BoardDAO">
+
+	<!-- Mybatis 사용시 쿼리문에 문자열 비교연산자나 부등호를 처리할 때가있습니다. 그러면 < 와 같은 기호를 괄호인지 아니면 
+		비교연산자 인지 확인이 되지않아요. 이외에도 특수문자 사용하는데 제한이있습니다. 대략 이런식으로요 이럴때 사용한것이 <![CDATA[ 
+		입니다. CDATA 안에 들어가는 문장을 문자열로 인식하게 합니다. -->
+	<sql id="search">
+		<if test="searchType != null">
+			<if test="searchType == 't'.toString()">
+				and title like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType == 'c'.toString()">
+				and content like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType == 'w'.toString()">
+				and writer like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType == 'tc'.toString()">
+				and ( title like CONCAT('%', #{keyword}, '%') OR content like
+				CONCAT('%', #{keyword}, '%'))
+			</if>
+			<if test="searchType == 'cw'.toString()">
+				and ( content like CONCAT('%', #{keyword}, '%') OR writer like
+				CONCAT('%', #{keyword}, '%'))
+			</if>
+			<if test="searchType == 'tcw'.toString()">
+				and ( title like CONCAT('%', #{keyword}, '%')
+				OR
+				content like CONCAT('%', #{keyword}, '%')
+				OR
+				writer like CONCAT('%', #{keyword}, '%'))
+			</if>
+		</if>
+	</sql>
+
+
+	<!-- 답변형 게시판 -->
+	<insert id="registReply" useGeneratedKeys="true" keyProperty="bno" keyColumn="bno" parameterType="boardVo">
+		INSERT INTO re_tbl_board(title,content,writer,uno)
+		VALUES(#{title},#{content},#{writer},#{uno});
+	</insert>
+
+	<select id="listReplyCriteria" resultType="boardVo">
+  	<![CDATA[  
+	  select * 
+	  from re_tbl_board 
+	  where bno > 0 
+	]]>
+
+		<include refid="search"></include>
+	  
+	<![CDATA[    
+	  ORDER BY origin DESC, seq ASC
+	  limit #{pageStart}, #{perPageNum}
+	]]>
+	</select>
+	
+
+	<select id="listReplyCount" resultType="int">
+	<![CDATA[  
+	  select count(bno) 
+	  from re_tbl_board 
+	  where bno > 0 
+	]]>
+		<include refid="search"></include>
+
+	</select>
+
+	<select id="readReply" resultType="boardVo">
+		select * from
+		re_tbl_board
+		where bno = #{bno}
+	</select>
+
+	<update id="updateReplyCnt">
+		update re_tbl_board set viewcnt = viewcnt+1 WHERE bno = #{bno}
+	</update>
+
+	<insert id="replyRegister">
+		INSERT INTO re_tbl_board(title,content,writer,origin,depth,seq,uno)
+		VALUES(#{title},#{content},#{writer},#{origin},#{depth},#{seq,},#{uno})
+	</insert>
+	
+	<update id="updateReply">
+		UPDATE re_tbl_board SET seq = seq+1 WHERE origin = #{origin} AND seq > #{seq} 
+	</update>
+	
+	 <update id="update">
+		 update re_tbl_board set title =#{title}, content =#{content} 
+		 where bno = #{bno}
+	 </update>
+		
+	 <delete id="delete">
+		 delete from re_tbl_board where bno = #{bno}
+	 </delete>
+	
+	<update id="updateOrigin">
+		UPDATE re_tbl_board SET origin = LAST_INSERT_ID() WHERE bno = LAST_INSERT_ID()
+	</update>
+
+	<insert id="addAttach">
+		INSERT INTO tbl_attach(fullname,bno) VALUES (#{fullname},LAST_INSERT_ID())
+	</insert>
+	
+	<select id="getAttach" resultType="string">
+		select fullname from tbl_attach where bno = #{bno} order by regdate
+	</select> 
+	
+	<delete id="deleteAttach">
+		delete from tbl_attach where bno = #{bno}
+	</delete>
+	
+	<insert id="replaceAttach" parameterType="java.util.HashMap">
+		insert into tbl_attach(fullname, bno) values (#{fullname}, #{bno})
+	</insert>
+	
+	<select id="getCommentCnt" resultType="int">
+		SELECT count(bno) FROM tbl_comment WHERE bno = #{bno};
+	</select>
+	
+	<select id="checkAuth" resultType="boardVo">
+		SELECT * FROM re_tbl_board
+		WHERE bno = #{bno} AND uno=#{uno}
+	</select>
+</mapper>
