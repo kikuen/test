@@ -30,6 +30,7 @@ public class CommentController {
   public ResponseEntity<String> register(@RequestBody CommentVo vo) {
 	 System.out.println("Git hub Test");
 	 System.out.println("Git hub 수정");
+	 System.out.println("Git hub 수정 했다고");
     ResponseEntity<String> entity = null;
     try {
       service.addComment(vo);
