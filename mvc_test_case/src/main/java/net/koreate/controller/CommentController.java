@@ -29,6 +29,7 @@ public class CommentController {
   @RequestMapping(value = "", method = RequestMethod.POST)
   public ResponseEntity<String> register(@RequestBody CommentVo vo) {
 	 System.out.println("Git hub Test");
+	 System.out.println("Git hub 수정");
     ResponseEntity<String> entity = null;
     try {
       service.addComment(vo);
