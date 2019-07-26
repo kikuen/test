@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.koreate.service.CommentService;
-import net.koreate.vo.Criteria;
-import net.koreate.vo.PageMaker;
 import net.koreate.vo.CommentVo;
+import net.koreate.vo.PageMaker;
 
 @RestController
 @RequestMapping("/comments")
@@ -30,7 +29,8 @@ public class CommentController {
   public ResponseEntity<String> register(@RequestBody CommentVo vo) {
 	 System.out.println("Git hub Test");
 	 System.out.println("Git hub 수정");
-	 System.out.println("Git hub 수정 했다고");
+	 System.out.println("Git hub 수정 했다고!!");
+	 System.out.println("복구하자");
     ResponseEntity<String> entity = null;
     try {
       service.addComment(vo);
